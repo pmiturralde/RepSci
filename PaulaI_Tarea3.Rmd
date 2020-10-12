@@ -1,0 +1,192 @@
+---
+title: "PaulaI_Tarea3"
+author: "Paula Iturralde-Pólit"
+date: "09/10/2020"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+## Cargar la función desde el repositorio local del curso
+
+```{r, echo=TRUE}
+
+
+library(ggplot2)
+library(rmarkdown)
+
+source("./scripts/replicar_reg_scal.R")
+
+```
+
+## Proporción de Falsos Positivos 
+
+Calcular la proporción de falsos positivos de acuerdo a la función anterior 
+Cambiar el número de variables y el valor de alpha 
+
+-- Número de variables: 10, 20, 50, 100
+
+
+-- Alpha: 0.05, 0.025, 0.005
+
+~~Yo se que podría hacer el siguiente código en un loop, pero por ahora lo dejo así~~
+
+```{r, echo=TRUE, results='hide'}
+
+#ALPHA = 0.05
+
+# Correr funcion con el numero de variables = 10 y alfa = 0.05
+a = replicar_reg_scal(itr = 100, nvars = 10, n = 30, alfa = 0.05)
+
+# Correr funcion con el numero de variables = 20 y alfa = 0.05
+b = replicar_reg_scal(itr = 100, nvars = 20, n = 30, alfa = 0.05)
+
+# Correr funcion con el numero de variables = 50 y alfa = 0.05
+c = replicar_reg_scal(itr = 100, nvars = 50, n = 30, alfa = 0.05)
+
+# Correr funcion con el numero de variables = 100 y alfa = 0.05
+d = replicar_reg_scal(itr = 100, nvars = 100, n = 30, alfa = 0.05)
+
+#ALPHA 0.025
+# Correr funcion con el numero de variables = 10 y alfa = 0.025 
+e = replicar_reg_scal(itr = 100, nvars = 10, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 20 y alfa 0.025 
+f = replicar_reg_scal(itr = 100, nvars = 20, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 50 y alfa 0.025 
+g = replicar_reg_scal(itr = 100, nvars = 50, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 100 y alfa 0.025 
+h = replicar_reg_scal(itr = 100, nvars = 100, n = 30, alfa = 0.025)
+
+#ALPHA = 0.005
+# Correr funcion con el numero de variables = 10 y alfa = 0.005 
+j = replicar_reg_scal(itr = 100, nvars = 10, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 20 y alfa 0.005 
+k = replicar_reg_scal(itr = 100, nvars = 20, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 50 y alfa 0.025 
+l = replicar_reg_scal(itr = 100, nvars = 50, n = 30, alfa = 0.025)
+
+# Correr funcion con el numero de variables = 100 y alfa 0.025 
+o = replicar_reg_scal(itr = 100, nvars = 100, n = 30, alfa = 0.025)
+
+
+```
+
+## Crear data frame
+
+Unir todos lo valores calculados por la función en un data frame para hacer el gráfico
+
+```{r, echo=TRUE}
+
+#Crear data frame con resultados
+
+res1 <- c(a,b,c,d)
+res2 <- c(e,f,g,h)
+res3 <- c(j,k,l,o)
+Var <- c(10, 20, 50, 100)
+
+
+df <- data.frame(Var,alfa = c(0.05, 0.025, 0.005), fp = c(res1, res2, res3))
+
+df$alfa <- factor(df$alfa)
+
+
+
+knitr::kable(df, col.names = c("Número de Variables", "Alpha","FP"), align = c("l", "c", "c"),
+             full_width = TRUE, position = "center", 
+             caption = "**Proporción de Falsos Positivos**")
+
+```
+
+
+## Graficar resultados 
+
+Usar la función ggplot para graficar los resultados de todas las itneraciones 
+
+
+```{r, include=FALSE, results='hide'}
+
+#prueba
+ggplot(df, aes(x = Var, y = fp, group = alfa)) +  
+  geom_point(shape = 16, size = 5, color = "slateblue4") +
+  geom_line(linetype="twodash",col="darkgoldenrod4",size=0.8) + 
+  labs(x = "Número de variables", y = "Falsos positivos" ) +
+  theme_bw()
+
+```
+
+```{r, echo=TRUE }
+
+ggplot(df, aes(x = Var, y = fp, group = alfa)) +
+  geom_point(aes(shape = alfa, color = alfa), size=5)+
+  scale_shape_manual(values = c(16, 17, 18))+
+  scale_color_manual(values = c("goldenrod2","brown2", "slateblue4"))+
+  geom_line(linetype="twodash", col = "#2e4057", size=0.8)+
+  xlim(1,100)+  ylim(0.05,0.6)+
+  theme_bw()+
+  theme(axis.text=element_text(size=12),
+       axis.title=element_text(size=14),
+       plot.title = element_text(hjust = 0.5,face = "bold"),
+        legend.position= c(0.1,0.8), legend.text = element_text(colour = "black", size = 10),
+        legend.title = element_text (colour = "black", size = 12))+
+  xlab("Número de variables") +  ylab("Falsos positivos") + ggtitle("Proporción de falsos positivos")
+   
+
+```
+
+
+
+
+```{r, echo=FALSE, results = 'hide'}
+
+#ggplot()+
+# geom_point(data = df, aes(Var,res1),shape=21, fill="goldenrod2", colour="darkgoldenrod4", size=5)+
+#  geom_line(data = df, aes(Var,res1), linetype="twodash",col="darkgoldenrod4",size=0.8)+
+  
+
+  
+#  geom_point(data = df, aes(Var,res2),shape=25, fill="brown2", colour="brown4", size=5)+
+#  geom_line(data = df, aes(Var,res2), linetype="twodash",col="brown4",size=0.8)+
+  
+#  geom_point(data = df, aes(Var,res3),shape=23, fill="slateblue4", colour="royalblue4", size=5)+
+#  geom_line(data = df, aes(Var,res3), linetype="twodash",col="royalblue4", size=0.8)+
+  
+#  xlim(1,100)+  ylim(0.05,0.6)+
+#    theme_bw()+
+#  theme(axis.text=element_text(size=10),
+#        axis.title=element_text(size=12),
+#       plot.title = element_text(hjust = 0.5,face = "bold"),
+#        legend.position= c(0.2,0.2), legend.text = element_text(colour = "black", size = 10),
+#        legend.title = element_text (colour = "black", size = 10))+
+#  xlab("Número de variables") +  ylab("Falsos positivos") + ggtitle("Proporción de falsos positivos")
+
+
+```
+
+## Mi animal no humano favorito es...
+
+
+![Photo by: Stanimira Deleva](C:/Users/pmiturralde/Desktop/Murcis/Fotos/Foto 7. Stanimira Deleva.jpg)
+
+
+## Información de la sesión
+
+```{r, echo=FALSE}
+
+sessionInfo()
+
+```
+
+
+*by: Paula Iturralde-Pólit*
+
+```{r, echo = FALSE}
+
+
+#render("C:/Users/pmiturralde/Documents/Paula_mi_bitacora/Doctorado_UCR/Cursos/Ciencia_Rep/Repositorio/curso_reproducible/curso_reproducible/PaulaI_Tarea3.Rmd")
+```
+
